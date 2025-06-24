@@ -1,0 +1,33 @@
+- name: Copying mongo repo
+  ansible.builtin.copy:
+    src: mongo.repo
+    dest: /etc/yum.repos.d/mongo.repo
+
+- name: Install mongodb client
+  ansible.builtin.package:
+    name: mongodb-org-shell
+    state: present
+
+- name: get the catalogue entries count
+  ansible.builtin.shell: mongo --host mongodb.arundev.store --quiet --eval 'db = db.getSiblingDB("catalogue"); db.products.count()'
+  register: products_count
+  when: component == "catalogue"
+
+- name: get the user entries count
+  ansible.builtin.shell: mongo --host mongodb.arundev.store --quiet --eval 'db=db.getSiblingDB("users"); db.users.count()'
+  register: users_count
+  when: component == "user"
+
+- name: print the count
+  ansible.builtin.debug:
+    msg: "products_count = {{products_count}}"
+
+- name: loading catalogue data
+  ansible.builtin.shell: "mongo --host mongodb.arundev.store  < /app/schema/catalogue.js"
+  when: products_count.stdout == "0" and component == "catalogue"
+  ignore_errors: true
+
+- name: "loading {{component}} data" 
+  ansible.builtin.shell: "mongo --host mongodb.arundev.store  < /app/schema/user.js"
+  when: users_count.stdout == "0" and component == "user"
+  ignore_errors: true
