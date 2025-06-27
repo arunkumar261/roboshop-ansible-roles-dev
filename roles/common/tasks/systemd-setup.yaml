@@ -1,7 +1,15 @@
+# without template
+# - name: "Copying the {{component}} service file"
+#   ansible.builtin.copy:
+#     src: "{{component}}.service"
+#     dest: "/etc/systemd/system/{{component}}.service" 
+
+
+# with template
 - name: "Copying the {{component}} service file"
-  ansible.builtin.copy:
-    src: "{{component}}.service"
-    dest: "/etc/systemd/system/{{component}}.service"
+  ansible.builtin.template:
+    src: "{{component}}.service.j2"
+    dest: "/etc/systemd/system/{{component}}.service" 
 
 - name: deamon reload
   ansible.builtin.systemd_service:
