@@ -9,25 +9,25 @@
     state: present
 
 - name: get the catalogue entries count
-  ansible.builtin.shell: mongo --host mongodb.arundev.store --quiet --eval 'db = db.getSiblingDB("catalogue"); db.products.count()'
+  ansible.builtin.shell: mongo --host {{MONGODB_HOST}} --quiet --eval 'db = db.getSiblingDB("catalogue"); db.products.count()'
   register: products_count
   when: component == "catalogue"
 
 - name: get the user entries count
-  ansible.builtin.shell: mongo --host mongodb.arundev.store --quiet --eval 'db=db.getSiblingDB("users"); db.users.count()'
+  ansible.builtin.shell: mongo --host {{MONGODB_HOST}} --quiet --eval 'db=db.getSiblingDB("users"); db.users.count()'
   register: users_count
   when: component == "user"
 
-- name: print the count
-  ansible.builtin.debug:
-    msg: "products_count = {{products_count}}"
+# - name: print the count
+#   ansible.builtin.debug:
+#     msg: "products_count = {{products_count}}"
 
 - name: loading catalogue data
-  ansible.builtin.shell: "mongo --host mongodb.arundev.store  < /app/schema/catalogue.js"
-  when: products_count.stdout == "0" and component == "catalogue"
-  ignore_errors: true
+  ansible.builtin.shell: "mongo --host {{MONGODB_HOST}}  < /app/schema/catalogue.js"
+  when: component == "catalogue" and products_count.stdout == "0" 
+  # ignore_errors: true
 
-- name: "loading {{component}} data" 
-  ansible.builtin.shell: "mongo --host mongodb.arundev.store  < /app/schema/user.js"
-  when: users_count.stdout == "0" and component == "user"
-  ignore_errors: true
+- name: loading user data 
+  ansible.builtin.shell: "mongo --host {{MONGODB_HOST}}  < /app/schema/user.js"
+  when: component == "user" and users_count.stdout == "0" 
+  # ignore_errors: true
