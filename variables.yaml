@@ -1,2 +1,3 @@
 MONGODB_HOST: mongodb.arundev.store
 REDIS_HOST: redis.arundev.store
+CATALOGUE_HOST: catalogue.arundev.store
