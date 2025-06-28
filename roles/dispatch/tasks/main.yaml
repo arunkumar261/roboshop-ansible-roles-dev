@@ -1,0 +1,15 @@
+- name: App setup 
+  ansible.builtin.import_role:
+    name: common
+    task_from: app-setup
+
+- name: GO-LANG setup 
+  ansible.builtin.import_role:
+    name: common
+    task_from: golang-setup.yaml
+
+- name: system restart setup 
+  ansible.builtin.import_role:
+    name: common
+    task_from: systemd-setup
+
